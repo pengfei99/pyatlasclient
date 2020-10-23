@@ -209,5 +209,6 @@ def handle_response(response):
 
     raise cls(**kwargs)
 
+
 class BadHttpAuthArg(ClientError):
-    super().__init__("You need to provide a login password or an oidc_token to connect to a Atlas sever")
+    super().__init__(message="You need to provide a login password or an oidc_token to connect to a Atlas sever")
