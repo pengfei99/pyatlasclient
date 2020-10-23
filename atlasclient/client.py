@@ -125,7 +125,6 @@ class HttpClient(object):
 
     def __init__(self, host, identifier, username=None, password=None, oidc_token=None, validate_ssl=True,
                  timeout=10, max_retries=5, auth=None):
-        basic_token = utils.generate_http_basic_token(username=username, password=password)
         if username is not None and password is not None and oidc_token is None:
             basic_token = utils.generate_http_basic_token(username=username, password=password)
             self.request_params = {
