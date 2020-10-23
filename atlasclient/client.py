@@ -77,7 +77,7 @@ class Atlas(object):
                                      password=password, identifier=identifier,
                                      validate_ssl=validate_ssl, timeout=timeout,
                                      max_retries=max_retries, auth=auth)
-        elif username is not None and password is None and oidc_token is not None:
+        elif username is None and password is None and oidc_token is not None:
             self.client = HttpClient(host=self.base_url, oidc_token=oidc_token, identifier=identifier,
                                      validate_ssl=validate_ssl, timeout=timeout,
                                      max_retries=max_retries, auth=auth)
@@ -133,7 +133,7 @@ class HttpClient(object):
                 'verify': validate_ssl,
                 'timeout': timeout,
             }
-        elif username is not None and password is None and oidc_token is not None:
+        elif username is None and password is None and oidc_token is not None:
             self.request_params = {
                 'headers': {'X-Requested-By': identifier,
                             'Authorization': 'Bearer {}'.format(oidc_token)},
