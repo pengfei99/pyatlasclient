@@ -67,6 +67,8 @@ class Atlas(object):
                  identifier=None, protocol=None, validate_ssl=True,
                  timeout=10, max_retries=5, auth=None):
         self.base_url = utils.generate_base_url(host, port=port, protocol=protocol)
+        if identifier is None:
+            identifier = 'python-atlasclient'
         self.client = HttpClient(host=self.base_url, username=username,
                                  password=password, identifier=identifier, oidc_token=oidc_token,
                                  validate_ssl=validate_ssl, timeout=timeout,
