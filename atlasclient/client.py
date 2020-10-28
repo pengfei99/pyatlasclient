@@ -66,23 +66,11 @@ class Atlas(object):
     def __init__(self, host, port=None, username=None, password=None, oidc_token=None,
                  identifier=None, protocol=None, validate_ssl=True,
                  timeout=10, max_retries=5, auth=None):
-
         self.base_url = utils.generate_base_url(host, port=port, protocol=protocol)
-
-        if identifier is None:
-            identifier = 'python-atlasclient'
-
-        if username is not None and password is not None and oidc_token is None:
-            self.client = HttpClient(host=self.base_url, username=username,
-                                     password=password, identifier=identifier,
-                                     validate_ssl=validate_ssl, timeout=timeout,
-                                     max_retries=max_retries, auth=auth)
-        elif username is None and password is None and oidc_token is not None:
-            self.client = HttpClient(host=self.base_url, oidc_token=oidc_token, identifier=identifier,
-                                     validate_ssl=validate_ssl, timeout=timeout,
-                                     max_retries=max_retries, auth=auth)
-        else:
-            raise BadHttpAuthArg
+        self.client = HttpClient(host=self.base_url, username=username,
+                                 password=password, identifier=identifier, oidc_token=oidc_token,
+                                 validate_ssl=validate_ssl, timeout=timeout,
+                                 max_retries=max_retries, auth=auth)
         self._version = None
 
     def __dir__(self):
@@ -125,23 +113,19 @@ class HttpClient(object):
 
     def __init__(self, host, identifier, username=None, password=None, oidc_token=None, validate_ssl=True,
                  timeout=10, max_retries=5, auth=None):
-        if username is not None and password is not None and oidc_token is None:
+        if oidc_token:
+            auth_header = f'Bearer {oidc_token}'
+        elif username and password:
             basic_token = utils.generate_http_basic_token(username=username, password=password)
-            self.request_params = {
-                'headers': {'X-Requested-By': identifier,
-                            'Authorization': 'Basic {}'.format(basic_token)},
-                'verify': validate_ssl,
-                'timeout': timeout,
-            }
-        elif username is None and password is None and oidc_token is not None:
-            self.request_params = {
-                'headers': {'X-Requested-By': identifier,
-                            'Authorization': 'Bearer {}'.format(oidc_token)},
-                'verify': validate_ssl,
-                'timeout': timeout,
-            }
+            auth_header = f'Basic {basic_token}'
         else:
             raise BadHttpAuthArg
+        self.request_params = {
+            'headers': {'X-Requested-By': identifier,
+                        'Authorization': auth_header},
+            'verify': validate_ssl,
+            'timeout': timeout,
+        }
         # automatically retry requests on connection errors
         self.session = requests.Session()
         self.session.auth = auth
